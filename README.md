@@ -1,65 +1,78 @@
-1. Tổng quan dự án
-Dự án xây dựng hệ thống xác thực người dùng bảo mật cao dành cho ứng dụng web hoặc mobile, sử dụng:
+# Dự án Hệ thống Xác thực Người dùng Bảo mật cao
 
-JWT (JSON Web Token) để cấp và quản lý token phiên đăng nhập.
+Dự án này xây dựng một hệ thống xác thực mạnh mẽ và an toàn cho các ứng dụng web và di động. Hệ thống sử dụng các công nghệ hiện đại để đảm bảo an toàn cho tài khoản người dùng, đồng thời mang lại trải nghiệm mượt mà và linh hoạt.
 
-Two-Factor Authentication (2FA) với chuẩn TOTP (Time-based One-Time Password), sử dụng Google Authenticator hoặc các app tương tự để tăng cường bảo mật.
+---
 
-Hỗ trợ đăng nhập thông thường (username/password) và mở rộng 2FA cho người dùng nâng cao.
+## ✨ Các tính năng chính
 
-Hỗ trợ Refresh Token để gia hạn phiên đăng nhập mà không cần đăng nhập lại.
+- **Xác thực cơ bản & Nâng cao**: Hỗ trợ đăng nhập bằng `username/password` truyền thống và tích hợp **Xác thực hai yếu tố (2FA)** để tăng cường bảo mật.
+- **Quản lý phiên với JWT**: Sử dụng **JSON Web Token (JWT)** để quản lý phiên đăng nhập một cách hiệu quả và an toàn (stateless).
+- **Xác thực hai yếu tố (2FA)**: Tích hợp chuẩn **TOTP (Time-based One-Time Password)**, cho phép người dùng sử dụng các ứng dụng như Google Authenticator, Authy để bảo vệ tài khoản.
+- **Gia hạn phiên đăng nhập (Refresh Token)**: Cho phép tự động làm mới phiên đăng nhập mà không yêu cầu người dùng đăng nhập lại, cải thiện trải nghiệm người dùng.
+- **Bảo mật API**: Tất cả các API yêu cầu tài nguyên đều được bảo vệ thông qua cơ chế xác thực JWT.
 
-2. Các thành phần chính
-Thành phần	Mô tả chi tiết
-User Authentication	Xác thực bằng username và password cơ bản.
-JWT Token Service	Cấp access token (JWT) và refresh token, quản lý phiên đăng nhập.
-Two-Factor Authentication (2FA)	Tích hợp 2FA bằng Google Authenticator, tạo và kiểm tra mã OTP theo chuẩn TOTP.
-Refresh Token Management	Lưu trữ và quản lý refresh token trên database, hỗ trợ làm mới token khi hết hạn.
-Quản lý người dùng	Lưu trữ thông tin người dùng, trạng thái 2FA, secret key 2FA (được mã hóa).
-API bảo mật	Các API bảo vệ bằng xác thực JWT, kiểm tra token và quyền truy cập.
+---
 
-3. Quy trình đăng nhập (Login flow)
-Người dùng gửi yêu cầu đăng nhập với username và password.
+## 🛠️ Các thành phần chính
 
-Nếu xác thực thành công và 2FA chưa bật:
+| Thành phần                 | Mô tả chi tiết                                                                                                  |
+| :------------------------- | :-------------------------------------------------------------------------------------------------------------- |
+| **User Authentication** | Xác thực người dùng thông qua `username` và `password`.                                                         |
+| **JWT Token Service** | Chịu trách nhiệm cấp phát `access token` (ngắn hạn) và `refresh token` (dài hạn) sau khi xác thực thành công. |
+| **Two-Factor Authentication (2FA)** | Tích hợp và xác minh mã OTP từ các ứng dụng như Google Authenticator.                                        |
+| **Refresh Token Management** | Lưu trữ và quản lý `refresh token` một cách an toàn trong cơ sở dữ liệu để gia hạn phiên đăng nhập.              |
+| **Quản lý người dùng** | Lưu trữ thông tin người dùng, trạng thái 2FA, và khóa bí mật 2FA (đã được mã hóa).                               |
+| **API bảo mật** | Các endpoints của ứng dụng được bảo vệ, yêu cầu một `access token` hợp lệ để truy cập.                            |
 
-Trả về JWT access token và refresh token để dùng cho các request sau.
+---
 
-Nếu 2FA đã bật:
+## ⚙️ Quy trình đăng nhập (Login Flow)
 
-Trả về yêu cầu nhập mã OTP.
+Hệ thống hỗ trợ hai luồng đăng nhập chính:
 
-Người dùng nhập mã OTP từ Google Authenticator app.
+**1. Đăng nhập thông thường (2FA chưa được kích hoạt):**
+1. Người dùng gửi `username` và `password`.
+2. Hệ thống xác thực thông tin.
+3. Nếu thành công, hệ thống trả về `JWT access token` và `refresh token`.
 
-Backend kiểm tra mã OTP đúng, sau đó mới tạo và trả về JWT access token và refresh token.
+**2. Đăng nhập với 2FA (đã được kích hoạt):**
+1. Người dùng gửi `username` và `password`.
+2. Hệ thống xác thực thông tin.
+3. Nếu thành công, hệ thống yêu cầu người dùng nhập mã OTP.
+4. Người dùng nhập mã OTP từ ứng dụng (ví dụ: Google Authenticator).
+5. Hệ thống xác thực mã OTP.
+6. Nếu mã OTP hợp lệ, hệ thống trả về `JWT access token` và `refresh token`.
 
-4. Công nghệ sử dụng
-Backend: Java Spring Boot
+---
 
-Xác thực JWT: thư viện jjwt
+## 🚀 Công nghệ sử dụng
 
-2FA TOTP: thư viện dev.samstevens.totp
+- **Backend**: `Java Spring Boot`
+- **Xác thực JWT**: Thư viện `io.jsonwebtoken/jjwt`
+- **2FA TOTP**: Thư viện `dev.samstevens/totp`
+- **Cơ sở dữ liệu**: `MySQL`
+  - **Database Schema**: [Xem sơ đồ tại đây](https://drawsql.app/teams/ad-87/diagrams/auth-service)
+- **Client-side 2FA**: `Google Authenticator` hoặc các ứng dụng tương thích.
 
-Cơ sở dữ liệu: Mysql(database schema: https://drawsql.app/teams/ad-87/diagrams/auth-service )
+### Quản lý Token
+- **Access Token**: Thời gian sống ngắn (ví dụ: **15 phút**) để giảm thiểu rủi ro khi bị lộ.
+- **Refresh Token**: Thời gian sống dài (ví dụ: **7 ngày**) để duy trì phiên đăng nhập.
 
-Google Authenticator: làm app tạo mã OTP trên điện thoại
+---
 
-Quản lý token: Access token ngắn hạn (ví dụ 15 phút), Refresh token dài hạn (ví dụ 7 ngày)
+## 🌟 Lợi ích của dự án
 
-5. Lợi ích dự án
-Tăng cường bảo mật: Không chỉ dựa vào mật khẩu mà còn xác minh qua mã OTP động.
+- **Tăng cường bảo mật**: Bảo vệ tài khoản người dùng khỏi các cuộc tấn công truy cập trái phép bằng cách kết hợp mật khẩu và mã OTP.
+- **Trải nghiệm người dùng tốt hơn**: Kiến trúc stateless với JWT giúp hệ thống dễ dàng mở rộng và không làm gián đoạn trải nghiệm người dùng.
+- **Quản lý phiên linh hoạt**: Refresh token cho phép người dùng duy trì đăng nhập trong thời gian dài một cách an toàn.
+- **Khả năng tương thích cao**: Dễ dàng tích hợp vào nhiều loại ứng dụng khác nhau như Web, Mobile, và các hệ thống Microservices.
 
-Trải nghiệm người dùng: Dùng JWT giúp hệ thống không trạng thái (stateless), dễ mở rộng.
+---
 
-Quản lý phiên linh hoạt: Refresh token giúp kéo dài phiên đăng nhập an toàn.
+## 🔮 Mở rộng & Nâng cấp trong tương lai
 
-Phù hợp với nhiều loại ứng dụng: Web, mobile, microservices.
-
-6. Mở rộng & nâng cấp tương lai
-Tích hợp thêm OAuth 2.0 (Google Sign-In, Facebook Login, v.v.)
-
-Hỗ trợ đa thiết bị, đa phiên làm việc
-
-Quản lý quyền truy cập chi tiết hơn (RBAC)
-
-Tích hợp hệ thống giám sát và cảnh báo đăng nhập bất thường
+- **Tích hợp OAuth 2.0**: Hỗ trợ đăng nhập thông qua các nhà cung cấp bên thứ ba như Google, Facebook, GitHub.
+- **Hỗ trợ đa thiết bị**: Cho phép người dùng đăng nhập và quản lý phiên trên nhiều thiết bị cùng lúc.
+- **Phân quyền chi tiết (RBAC)**: Xây dựng hệ thống quản lý vai trò và quyền hạn (Role-Based Access Control) để kiểm soát truy cập tài nguyên.
+- **Giám sát và cảnh báo**: Tích hợp hệ thống giám sát để phát hiện và cảnh báo các hoạt động đăng nhập bất thường.
